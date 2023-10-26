@@ -1,5 +1,5 @@
 import { Badge, Stack } from "react-bootstrap"
-import { Tag } from "../App"
+import { Tag } from "../Types"
 
 type TagsProps = {
   tags: Tag[]

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import ReactSelect from "react-select"
 import styles from "./NoteList.module.css"
 import { Tags } from "./Tags"
-import { Note, Tag } from "./Types"
+import { Note, Tag } from "../Types"
 
 type SimplifiedNote = {
   tags: Tag[]
@@ -20,6 +20,8 @@ type NoteListProps = {
 export function NoteList({ availableTags, notes }: NoteListProps) {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
   const [title, setTitle] = useState("")
+  
+  
   const filteredNotes = useMemo(() => {
     return notes.filter((note) => {
       return (

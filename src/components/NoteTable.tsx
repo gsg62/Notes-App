@@ -9,11 +9,11 @@ import { useEffect, useState } from "react"
 import { Fade } from "react-bootstrap"
 import removeMarkdown from "markdown-to-text"
 import { Tags } from "./Tags"
-import { Note, Tag } from "./Types"
+import { Note, Tag } from "../Types"
 import { Link } from "react-router-dom"
 import Button from "@mui/material/Button"
 import Select, { SelectChangeEvent } from "@mui/material/Select"
-import { Checkbox, ListItemText, MenuItem } from "@mui/material"
+import { Checkbox, InputLabel, ListItemText, MenuItem } from "@mui/material"
 
 type NoteTableProps = {
   tags: Tag[]
@@ -21,54 +21,51 @@ type NoteTableProps = {
 }
 
 export function NoteTable({ notes, tags }: NoteTableProps) {
-  const [tagFilters, setTagFilters] = useState<string[]>([])
-
-  // create filter react select check box component for filtering tags
-  function tagFilterInput(props: GridFilterInputValueProps) {
-    console.log("file: NoteTable.tsx:28 ~ props:", props)
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // custom filter input for filtering tags
+  function tagFilterInput({ item, applyValue }: GridFilterInputValueProps) {
+    const [tagFilters, setTagFilters] = useState<string[]>([])
+    
     const handleChange = (event: SelectChangeEvent<any>) => {
-      console.log("file: NoteTable.tsx:22 ~ event:", event)
       setTagFilters(event.target.value)
+      applyValue({ ...item, value: event.target.value })
     }
 
     return (
-      <Select
-        multiple
-        value={tagFilters}
-        onChange={handleChange}
-        renderValue={(selected) => selected.join(", ")}
-        // MenuProps={MenuProps}
-        sx={{ height: "100%" }}
-      >
-        {tags.map((tag) => (
-          <MenuItem key={tag.id} value={tag.label}>
-            <Checkbox checked={tagFilters.includes(tag.label)} />
-            <ListItemText primary={tag.label} />
-          </MenuItem>
-        ))}
-      </Select>
+      <>
+        <InputLabel id="tagLabel">Tag</InputLabel>
+        <Select
+          multiple
+          labelId="tagLabel"
+          value={tagFilters}
+          onChange={handleChange}
+          renderValue={(selected) => selected.join(", ")}
+          sx={{ height: "100%" }}
+        >
+          {tags.map((tag) => (
+            <MenuItem key={tag.id} value={tag.label}>
+              <Checkbox checked={tagFilters.includes(tag.label)} />
+              <ListItemText primary={tag.label} />
+            </MenuItem>
+          ))}
+        </Select>
+      </>
     )
   }
 
+  // custom input operator for filtering tags
   const tagFilterOperators: GridFilterOperator[] = [
     {
       label: "Contains",
       value: "contains",
       getApplyFilterFn: (filterItem: GridFilterItem) => {
-        console.log("file: NoteTable.tsx:21 ~ filterItem:", filterItem)
-        // return null
-        // if (!filterItem.field || !filterItem.value || !filterItem.operator) {
-        //   return null;
-        // }
+        if (!filterItem.field || !filterItem.value || !filterItem.operator) {
+          return null
+        }
 
         return (params): boolean => {
-          console.log("file: NoteTable.tsx:66 ~ filterParams:", params)
-          // return true
           return (
-            tagFilters.length === 0 ||
-            tagFilters.every((tag) =>
+            filterItem.value.length === 0 ||
+            filterItem.value.every((tag: string) =>
               params.formattedValue.some(
                 (noteTag: Tag) => noteTag.label === tag
               )
@@ -77,7 +74,7 @@ export function NoteTable({ notes, tags }: NoteTableProps) {
         }
       },
       InputComponent: tagFilterInput,
-      // InputComponentProps: { type: 'number' },
+      InputComponentProps: { type: "string" },
     },
   ]
 

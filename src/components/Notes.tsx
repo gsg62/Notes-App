@@ -1,23 +1,16 @@
-import { Button, Col, Form, Modal, Row, Stack } from "react-bootstrap"
+import { Button, Col, Form, Row, Stack } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import { NoteList } from "./NoteList"
 import { useState } from "react"
 import { NoteTable } from "./NoteTable"
-import { Note, Tag } from "./Types"
+import { Note, Tag } from "../Types"
+import { EditTagsModal } from "./EditTagsModal"
 
 type NoteProps = {
   tags: Tag[]
   notes: Note[]
   onDeleteTag: (id: string) => void
   onUpdateTag: (id: string, label: string) => void
-}
-
-type EditTagsModalProps = {
-  show: boolean
-  availableTags: Tag[]
-  handleClose: () => void
-  onDelete: (id: string) => void
-  onUpdate: (id: string, label: string) => void
 }
 
 export function Notes({ notes, tags, onDeleteTag, onUpdateTag }: NoteProps) {
@@ -65,46 +58,5 @@ export function Notes({ notes, tags, onDeleteTag, onUpdateTag }: NoteProps) {
         onDelete={onDeleteTag}
       />
     </>
-  )
-}
-
-function EditTagsModal({
-  availableTags,
-  show,
-  handleClose,
-  onUpdate,
-  onDelete,
-}: EditTagsModalProps) {
-  return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Tags</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Stack gap={2}>
-            {availableTags.map((tag) => (
-              <Row key={tag.id}>
-                <Col>
-                  <Form.Control
-                    type="text"
-                    value={tag.label}
-                    onChange={(e) => onUpdate(tag.id, e.target.value)}
-                  />
-                </Col>
-                <Col xs="auto">
-                  <Button
-                    onClick={() => onDelete(tag.id)}
-                    variant="outline-danger"
-                  >
-                    &times;
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-          </Stack>
-        </Form>
-      </Modal.Body>
-    </Modal>
   )
 }
