@@ -5,15 +5,21 @@ import {
   GridFilterItem,
   GridFilterOperator,
 } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
+import {
+  Checkbox,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Button,
+} from "@mui/material"
+import Select, { SelectChangeEvent } from "@mui/material/Select"
+import { useState } from "react"
 import { Fade } from "react-bootstrap"
+import { Link } from "react-router-dom"
 import removeMarkdown from "markdown-to-text"
 import { Tags } from "./Tags"
 import { Note, Tag } from "../Types"
-import { Link } from "react-router-dom"
-import Button from "@mui/material/Button"
-import Select, { SelectChangeEvent } from "@mui/material/Select"
-import { Checkbox, InputLabel, ListItemText, MenuItem } from "@mui/material"
+import useTransition from "../hooks/useTransition"
 
 type NoteTableProps = {
   tags: Tag[]
@@ -21,10 +27,12 @@ type NoteTableProps = {
 }
 
 export function NoteTable({ notes, tags }: NoteTableProps) {
+  const { transitionIn, timeout } = useTransition()
+
   // custom filter input for filtering tags
   function tagFilterInput({ item, applyValue }: GridFilterInputValueProps) {
     const [tagFilters, setTagFilters] = useState<string[]>([])
-    
+
     const handleChange = (event: SelectChangeEvent<any>) => {
       setTagFilters(event.target.value)
       applyValue({ ...item, value: event.target.value })
@@ -53,7 +61,7 @@ export function NoteTable({ notes, tags }: NoteTableProps) {
   }
 
   // custom input operator for filtering tags
-  const tagFilterOperators: GridFilterOperator[] = [
+  const tagFilterOps: GridFilterOperator[] = [
     {
       label: "Contains",
       value: "contains",
@@ -74,7 +82,6 @@ export function NoteTable({ notes, tags }: NoteTableProps) {
         }
       },
       InputComponent: tagFilterInput,
-      InputComponentProps: { type: "string" },
     },
   ]
 
@@ -94,7 +101,7 @@ export function NoteTable({ notes, tags }: NoteTableProps) {
     {
       field: "markdown",
       headerName: "Markdown",
-      width: 500,
+      width: 350,
       valueGetter: ({ row }) => {
         return removeMarkdown(row.markdown)
       },
@@ -102,22 +109,40 @@ export function NoteTable({ notes, tags }: NoteTableProps) {
     {
       field: "tags",
       headerName: "Tags",
-      width: 300,
-      filterOperators: tagFilterOperators,
+      width: 200,
+      filterOperators: tagFilterOps,
       renderCell: ({ row }) => {
         return <Tags tags={row.tags} />
       },
     },
+    {
+      field: "createdDate",
+      headerName: "Created",
+      type: "date",
+      width: 250,
+      valueGetter: ({ value }) => {
+        return new Date(value)
+      },
+      valueFormatter({ value }) {
+        return value.toUTCString()
+      },
+    },
+    {
+      field: "lastModifiedDate",
+      headerName: "Last Modified",
+      type: "date",
+      width: 250,
+      valueGetter: ({ value }) => {
+        return new Date(value)
+      },
+      valueFormatter({ value }) {
+        return value.toUTCString()
+      },
+    },
   ]
 
-  const [transitionIn, setTransitionIn] = useState(false)
-
-  useEffect(() => {
-    setTransitionIn(true)
-  }, [])
-
   return (
-    <Fade in={transitionIn} timeout={600}>
+    <Fade in={transitionIn} timeout={timeout}>
       <DataGrid rows={notes} columns={columns} />
     </Fade>
   )

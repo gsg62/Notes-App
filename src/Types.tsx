@@ -3,7 +3,9 @@ export type Note = {
 } & NoteData
 
 export type RawNote = {
-  id: string
+  id: string  
+  createdDate: Date
+  lastModifiedDate: Date
 } & RawNoteData
 
 export type RawNoteData = {
@@ -16,6 +18,7 @@ export type NoteData = {
   title: string
   markdown: string
   tags: Tag[]
+  lastModifiedDate: Date
 }
 
 export type Tag = {

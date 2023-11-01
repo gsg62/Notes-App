@@ -20,7 +20,13 @@ const useNotes = () => {
     setRawNotes((prevNotes) => {
       return [
         ...prevNotes,
-        { ...data, id: uuidv4(), tagIds: tags.map((tag) => tag.id) },
+        {
+          ...data,
+          id: uuidv4(),
+          tagIds: tags.map((tag) => tag.id),
+          createdDate: new Date(),
+          lastModifiedDate: new Date(),
+        },
       ]
     })
   }

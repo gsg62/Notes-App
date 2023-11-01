@@ -1,27 +1,26 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, Col, Fade, Form, Row, Stack } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import ReactSelect from "react-select"
-import styles from "./NoteList.module.css"
+import styles from "./NoteCards.module.css"
 import { Tags } from "./Tags"
 import { Note, Tag } from "../Types"
+import useTransition from "../hooks/useTransition"
 
-type SimplifiedNote = {
-  tags: Tag[]
-  title: string
-  id: string
+type NoteCardProps = {
+  note: Note
 }
 
-type NoteListProps = {
+type NoteCardsProps = {
   availableTags: Tag[]
   notes: Note[]
 }
 
-export function NoteList({ availableTags, notes }: NoteListProps) {
+export function NoteCards({ availableTags, notes }: NoteCardsProps) {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([])
   const [title, setTitle] = useState("")
-  
-  
+  const { transitionIn, timeout } = useTransition()
+
   const filteredNotes = useMemo(() => {
     return notes.filter((note) => {
       return (
@@ -35,14 +34,8 @@ export function NoteList({ availableTags, notes }: NoteListProps) {
     })
   }, [title, selectedTags, notes])
 
-  const [transitionIn, setTransitionIn] = useState(false)
-
-  useEffect(() => {
-    setTransitionIn(true)
-  }, [])
-
   return (
-    <Fade in={transitionIn} timeout={600}>
+    <Fade in={transitionIn} timeout={timeout}>
       <Stack gap={1}>
         <Form>
           <Row className="mb-4">
@@ -85,7 +78,7 @@ export function NoteList({ availableTags, notes }: NoteListProps) {
         <Row xs={1} sm={2} lg={3} xl={4} className="g-3">
           {filteredNotes.map((note) => (
             <Col key={note.id}>
-              <NoteCard title={note.title} id={note.id} tags={note.tags} />
+              <NoteCard note={note} />
             </Col>
           ))}
         </Row>
@@ -94,11 +87,11 @@ export function NoteList({ availableTags, notes }: NoteListProps) {
   )
 }
 
-function NoteCard({ title, id, tags }: SimplifiedNote) {
+function NoteCard({ note }: NoteCardProps) {
   return (
     <Card
       as={Link}
-      to={`/${id}`}
+      to={`/${note.id}`}
       className={`h-100 text-reset text-decoration-none ${styles.card}`}
     >
       <Card.Body>
@@ -106,10 +99,15 @@ function NoteCard({ title, id, tags }: SimplifiedNote) {
           gap={2}
           className="align-items-center justify-content-center h-100"
         >
-          <span className="fs-5">{title}</span>
-          <Tags tags={tags} />
+          <span className="fs-5 text-center">{note.title}</span>
+          <Tags tags={note.tags} />
         </Stack>
       </Card.Body>
+      <Card.Footer>
+        <small className="text-muted">
+          Last modified: {new Date(note.lastModifiedDate).toUTCString()}
+        </small>
+      </Card.Footer>
     </Card>
   )
 }

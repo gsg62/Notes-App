@@ -1,6 +1,6 @@
 import { Button, Col, Form, Row, Stack } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import { NoteList } from "./NoteList"
+import { NoteCards } from "./NoteCards"
 import { useState } from "react"
 import { NoteTable } from "./NoteTable"
 import { Note, Tag } from "../Types"
@@ -17,10 +17,6 @@ export function Notes({ notes, tags, onDeleteTag, onUpdateTag }: NoteProps) {
   const [editTagsModalOpen, setEditTagsModalOpen] = useState(false)
   const [showAsTable, setShowAsTable] = useState(false)
 
-  const handleChange = () => {
-    setShowAsTable(!showAsTable)
-  }
-
   return (
     <>
       <Row className="align-items-center mb-4">
@@ -31,7 +27,7 @@ export function Notes({ notes, tags, onDeleteTag, onUpdateTag }: NoteProps) {
           <Stack gap={4} direction="horizontal">
             <Form.Switch
               label="Show as table"
-              onChange={() => handleChange()}
+              onChange={() => setShowAsTable(!showAsTable)}
             ></Form.Switch>
             <Link to={"/new"}>
               <Button variant="primary">Create</Button>
@@ -48,7 +44,7 @@ export function Notes({ notes, tags, onDeleteTag, onUpdateTag }: NoteProps) {
       {showAsTable ? (
         <NoteTable notes={notes} tags={tags} />
       ) : (
-        <NoteList notes={notes} availableTags={tags} />
+        <NoteCards notes={notes} availableTags={tags} />
       )}
       <EditTagsModal
         availableTags={tags}
